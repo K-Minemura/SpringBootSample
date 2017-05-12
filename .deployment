@@ -1,3 +1,2 @@
 [config]
-command = gradlew assemble
-command = cp %DEPLOYMENT_SOURCE%\build\libs\SpringBootSample-0.0.1-SNAPSHOT.jar %DEPLOYMENT_TARGET%\webapps\SpringBootSample.jar
+command = %DEPLOYMENT_SOURCE%\deploy.bat
