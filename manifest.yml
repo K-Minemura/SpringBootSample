@@ -1,0 +1,6 @@
+---
+applications:
+- name: SpringBootSample
+  memory: 1G
+  random-route: true
+
