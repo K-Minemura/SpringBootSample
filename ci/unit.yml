@@ -12,4 +12,4 @@ caches:
 - path: repo/gradleCache
 
 run:
-  path: repo/ci/build.sh
+  path: repo/ci/unit.sh
