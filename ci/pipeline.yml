@@ -39,5 +39,5 @@ jobs:
   - put: cf
     params:
       manifest: repo/manifest.yml
-      path: build/libs/SpringBootSample-SNAPSHOT-1.0.0.jar
+      path: build/libs/SpringBootSample-0.0.1-SNAPSHOT.jar
       current_app_name: spring-boot-sample-kmine
