@@ -1,0 +1,6 @@
+endpoints:
+  sensitive: true
+
+management:
+  security:
+    enabled: true
