@@ -1,3 +1,14 @@
 security:
   basic:
     enabled: false
+
+info:
+  demo:
+    message: Hello World!
+    foo: Foo Foo
+
+management:
+  info:
+    git:
+      mode: full
+    
