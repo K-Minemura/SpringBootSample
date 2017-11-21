@@ -1,0 +1,15 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: {repository: java, tag: openjdk-8}
+
+inputs:
+- name: repo
+
+caches:
+- path: repo/gradleCache
+
+run:
+  path: repo/ci/script/unit.sh

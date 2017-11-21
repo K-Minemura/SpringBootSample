@@ -1,0 +1,43 @@
+---
+resources:
+# source repository
+- name: repo
+  type: git
+  source:
+    uri: https://github.com/K-Minemura/SpringBootSample.git
+    branch: feature/pcf
+# cloud foundry
+- name: cf
+  type: cf
+  source:
+    api: ((cf-api))
+    username: ((cf-username))
+    password: ((cf-password))
+    organization: ((cf-org))
+    space: ((cf-space))
+    skip_cert_check: true
+
+jobs:
+# unit test
+- name: unit-test
+  plan:
+  - get: repo
+    trigger: true
+  - task: gradle-test
+    file: repo/ci/unit.yml
+# build and deploy
+- name: build-and-deploy
+  plan:
+  - get: repo
+    passed:
+    - unit-test
+    trigger: true
+  # build
+  - task: build
+    file: repo/ci/build.yml
+  # deploy
+  - put: cf
+    params:
+      manifest: repo/manifest.yml
+      path: build/app.jar
+      current_app_name: spring-boot-sample-kmine
