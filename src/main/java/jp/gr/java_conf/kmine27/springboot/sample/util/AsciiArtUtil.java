@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 public class AsciiArtUtil {
 
     public String createTree() {
-        return createTree("Happy Merry X'mas !!! \r\n");
+        return createTree("Happy Merry X'mas !! \r\n");
     }
 
     public String createTree(String message) {
