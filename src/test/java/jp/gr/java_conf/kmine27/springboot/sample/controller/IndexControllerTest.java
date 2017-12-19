@@ -41,7 +41,7 @@ public class IndexControllerTest {
         mvc.perform(get("/"))
            .andExpect(status().isOk())
            .andExpect(content().string(
-                   "Happy Merry X'mas !!!?? \r\n" +
+                   "Happy Merry X'mas !!!? \r\n" +
                    "　 ＋　　・　 ＋\r\n" + 
                    "　　　 ﾟ｡：｡ﾟ　　＋\r\n" + 
                    "＊ 　・‥☆‥・\r\n" + 
