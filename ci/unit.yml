@@ -8,6 +8,9 @@ image_resource:
 inputs:
 - name: repo
 
+outputs:
+- name: unit-result
+
 caches:
 - path: repo/gradleCache
 
