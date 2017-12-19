@@ -1,0 +1,68 @@
+---
+resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+    tag: latest
+
+resources:
+# source repository
+- name: repo
+  type: git
+  source:
+    uri: https://github.com/K-Minemura/SpringBootSample.git
+    branch: feature/slack
+# cloud foundry
+- name: cf
+  type: cf
+  source:
+    api: {{cf-api}}
+    username: {{cf-username}}
+    password: {{cf-password}}
+    organization: {{cf-org}}
+    space: {{cf-space}}
+    skip_cert_check: true
+# slack
+- name: slack
+  type: slack-notification
+  source:
+    url: {{slack-url}}
+    insecure: true
+
+jobs:
+# unit test
+- name: unit-test
+  plan:
+  - get: repo
+    trigger: true
+  - task: gradle-test
+    file: repo/ci/unit-test.yml
+  on_failure:
+    put: slack
+    params:
+      channel: '#concourse'
+      text_file: unit-result/message.txt
+      text: {{concourse-message}}
+# build and deploy
+- name: build-and-deploy
+  plan:
+  - get: repo
+    passed:
+    - unit-test
+    trigger: true
+  # build
+  - task: build
+    file: repo/ci/build-test.yml
+  # deploy
+  - put: cf
+    params:
+      manifest: repo/manifest.yml
+      path: build/app.jar
+      current_app_name: spring-boot-sample-kmine
+  on_failure:
+    put: slack
+    params:
+      channel: '#concourse'
+      text_file: build/message.txt
+      text: {{concourse-message}}
