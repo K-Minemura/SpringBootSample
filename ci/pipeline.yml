@@ -12,7 +12,7 @@ resources:
   type: git
   source:
     uri: https://github.com/K-Minemura/SpringBootSample.git
-    branch: feature/pcf
+    branch: develop
 # cloud foundry
 - name: cf
   type: cf
