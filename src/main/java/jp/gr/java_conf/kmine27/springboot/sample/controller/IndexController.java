@@ -36,6 +36,6 @@ public class IndexController {
 	@RequestMapping("/")
 	@ResponseBody
 	public String rest() {
-	    return aaUtil.createTree("Happy Merry X'mas !!! \r\n");
+	    return aaUtil.createTree();
 	}
 }
