@@ -16,6 +16,6 @@ public class LogoController {
     @RequestMapping("/logo")
 	@ResponseBody
 	public String rest() {
-		return aaUtil.createSpringBootLogo();
+		return aaUtil.createConcourseLogo();
 	}
 }
