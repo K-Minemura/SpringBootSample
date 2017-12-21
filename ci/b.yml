@@ -1,0 +1,121 @@
+---
+resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+    tag: latest
+
+resources:
+# source repository
+- name: repo
+  type: git
+  source:
+    uri: https://github.com/K-Minemura/SpringBootSample.git
+    branch: feature/pcf
+# cloud foundry
+- name: cf
+  type: cf
+  source:
+    api: {{cf-api}}
+    username: {{cf-username}}
+    password: {{cf-password}}
+    organization: {{cf-org}}
+    space: {{cf-space}}
+    skip_cert_check: true
+# slack
+- name: slack
+  type: slack-notification
+  source:
+    url: {{slack-url}}
+    insecure: true
+
+jobs:
+# unit test
+- name: unit-test
+  plan:
+  - get: repo
+    trigger: true
+  - task: gradle-test
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source: {repository: java, tag: openjdk-8}
+      inputs:
+      - name: repo
+      outputs:
+      - name: unit-result
+      caches:
+      - path: repo/gradleCache
+      run:
+        path: bash
+        args:
+        - -c
+        - |
+          set -e
+          cd repo
+          rm -rf ~/.gradle
+          ln -fs $(pwd)/gradleCache ~/.gradle
+          set +e
+          ./gradlew --no-daemon test
+          if [ ! $? = 0 ]; then
+            echo "test failed." > ../unit-result/message.txt
+            exit 1
+          fi
+  on_failure:
+    put: slack
+    params:
+      channel: '#concourse'
+      text_file: unit-result/message.txt
+      text: {{concourse-message}}
+# build and deploy
+- name: build-and-deploy
+  plan:
+  - get: repo
+    passed:
+    - unit-test
+    trigger: true
+  # build
+  - task: build
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source: {repository: java, tag: openjdk-8}
+      inputs:
+      - name: repo
+      outputs:
+      - name: build
+      caches:
+      - path: repo/gradleCache
+      run:
+        path: bash
+        args:
+        - -c
+        - |
+          set -e
+          cd repo
+          rm -rf ~/.gradle
+          ln -fs $(pwd)/gradleCache ~/.gradle
+          set +e
+          ./gradlew --no-daemon build -x test
+          if [ ! $? = 0 ]; then
+            echo "build failed" > ../build/message.txt
+            exit 1
+          fi
+          set -e
+          mv build/libs/SpringBootSample.jar ../build/app.jar
+
+  # deploy
+  - put: cf
+    params:
+      manifest: repo/manifest.yml
+      path: build/app.jar
+      current_app_name: spring-boot-sample-kmine
+  on_failure:
+    put: slack
+    params:
+      channel: '#concourse'
+      text_file: build/message.txt
+      text: {{concourse-message}}
